@@ -1,30 +1,32 @@
-#include "piece.cpp"
-#include <iostream>
+#include "packed_column.cpp"
 #include <format>
-
-// Ordered by 
-typedef uint32_t Board;
 
 int getSquareFromCoordinates(int column, int row) {
     return 8 * column + row;
 }
 
-Piece Board_getSquare(Board& board, int square) {
-    int shiftDistance = 4 * (64 - square);
-    return static_cast<Piece>((board >> shiftDistance) & 0b1111);
+class Board {
+private:
+    PackedColumn _columns[8];
+public:
+    Board create();
+    Piece getSquare(int square);
+    void setSquare(int square, Piece& piece);
+    std::string toString();
+};
+
+
+Piece Board::getSquare(int square) {
+    
 }
 
-void Board_setSquare(Board& board, int square, Piece& piece) {
+void Board::setSquare(int square, Piece& piece) {
     if (Piece_isEmpty(piece)) return;
-    int shiftDistance = 4 * (64 - square);
-    Board mask = ~(0b1111 << shiftDistance);
-    Board pieceInSquare = static_cast<Board>(piece) << shiftDistance;
-    board &= mask;
-    board |= pieceInSquare;
+    
 }
 
-Board Board_new() {
-    Board board = 0;
+Board Board::create() {
+    Board board;
     
     Piece startingPosition[] = {
         PIECE('R'), PIECE('N'), PIECE('B'), PIECE('Q'), PIECE('K'), PIECE('B'), PIECE('N'), PIECE('R'),
@@ -38,19 +40,20 @@ Board Board_new() {
     };
 
     for (int j = 0; j < 64; j++) {
-        std::cout << std::format("Square {:>2}: {}", j, Piece_toChar(startingPosition[j])) << std::endl;
-        Board_setSquare(board, j, startingPosition[j]);
+        Board::setSquare(63 - j, startingPosition[j]);
     }
     
     return board;
 }
 
-std::string Board_toString(Board& board) {
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            int square = getSquareFromCoordinates(i, j);
-        }
-    }
+std::string Board::toString() {
+    std::string resultant = "";
 
-    return "";
+    for (int i = 0; i < 8; i++) {
+        PackedColumn currentColumn = _columns[7 - i];
+        resultant += std::format("{} {}\n", 8 - i, PackedColumn_toString(currentColumn));
+    }
+    resultant += "  abcdefgh";
+
+    return resultant;
 }

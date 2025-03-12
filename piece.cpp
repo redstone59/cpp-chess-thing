@@ -8,13 +8,13 @@
     (piece == 'n' || piece == 'N') ? PieceType::KNIGHT : \
     (piece == 'r' || piece == 'R') ? PieceType::ROOK   : \
     (piece == 'q' || piece == 'Q') ? PieceType::QUEEN  : \
-    (piece == 'k' || piece == 'K') ? PieceType::KING   : PieceType::ERROR
+    (piece == 'k' || piece == 'K') ? PieceType::KING   : PieceType::EMPTY
 #define PIECE(piece) Piece_new(PIECE_TYPE(piece), isupper(piece))
 
 typedef uint8_t Piece;
 
 enum PieceType {
-    ERROR, // Should never be accessed
+    EMPTY, // Should never be accessed
     PAWN,
     BISHOP,
     KNIGHT,
@@ -31,7 +31,7 @@ Piece Piece_new(PieceType type, bool isBlack) {
 }
 
 bool Piece_isEmpty(Piece& piece) {
-    return piece == 0b0000;
+    return piece & 0b0111 == 0b0000; // Clear "isBlack" flag
 }
 
 bool Piece_isBlack(Piece& piece) {
@@ -43,7 +43,7 @@ PieceType Piece_type(Piece& piece) {
 }
 
 char Piece_toChar(Piece& piece) {
-    if (Piece_isEmpty(piece)) return ' ';
+    if (Piece_isEmpty(piece)) return '#';
     char pieceChar = "pbnrqk"[Piece_type(piece) - 1];
     return Piece_isBlack(piece) ? std::toupper(pieceChar) : pieceChar;
 }
